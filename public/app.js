@@ -13,3 +13,6 @@ document.addEventListener('click',async e=>{const b=e.target.closest('button');i
 render();if(selectedGame&&room&&token)api('state').then(accept).catch(e=>{$('#error').textContent=e.message});setInterval(async()=>{tick();if(selectedGame&&data&&!busy){try{accept(await api('state'));$('#error').textContent=''}catch(e){$('#error').textContent='เชื่อมต่อไม่ได้: '+e.message}}},1500);
 
 setInterval(tick,250);
+
+function showLeaveControl(){const active=data;let button=document.querySelector('#leave-room');if(!active){button?.remove();return}if(!button){button=document.createElement('button');button.id='leave-room';button.textContent='ออกจากห้อง / เปลี่ยนชื่อ';button.style.marginTop='24px';button.onclick=async()=>{if(busy)return;if(!confirm('ออกจากห้องและคืนชื่อนี้ให้เพื่อน? ถ้ากำลังเล่น ทุกคนจะกลับห้องรอ คะแนนเดิมยังอยู่'))return;busy=true;try{await api('leave');try{localStorage.removeItem('spy:'+room)}catch{}token='';data=null;last='';render();showLeaveControl()}catch(e){document.querySelector('#error').textContent=e.message}finally{busy=false}};document.querySelector('main').append(button)}}
+setInterval(showLeaveControl,500);
